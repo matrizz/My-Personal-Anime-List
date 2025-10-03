@@ -1,27 +1,32 @@
-export interface Anime {
-  mal_id: number
-  title: string
-  title_english?: string
-  images: {
-    jpg: {
-      image_url: string
-      large_image_url: string
-    }
-  }
-  synopsis?: string
-  year?: number
-  score?: number
-  episodes?: number
-  status?: string
-}
+import type { Anime as AnimeModel } from './prisma'
 
-export type ListType = "toWatch" | "watching" | "watched" | "doNotWatch"
+export type ListType = "TO_WATCH" | "WATCHING" | "WATCHED" | "DO_NOT_WATCH"
 
 export type ViewType = "search" | "discovery" | "random" | ListType
 
-export interface AnimeList {
-  toWatch: Anime[]
-  watching: Anime[]
-  watched: Anime[]
-  doNotWatch: Anime[]
+type Image = {
+  image_url: string,
+  small_image_url: string,
+  large_image_url: string,
+}
+
+type AnimeImages = {
+  jpg: Image
+  webp: Image
+}
+
+type Anime = AnimeModel & {
+  images: AnimeImages
+}
+
+export enum Status {
+  TO_WATCH = 'TO_WATCH',
+  WATCHING = 'WATCHING',
+  WATCHED = 'WATCHED',
+  DO_NOT_WATCH = 'DO_NOT_WATCH',
+}
+
+export type {
+  Anime,
+  Image
 }

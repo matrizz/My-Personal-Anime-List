@@ -1,0 +1,21 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "start": "node -r tsconfig-paths/register server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.17.1",
+  "devDependencies": {
+    "tsconfig-paths": "^4.2.0"
+  },
+  "dependencies": {
+    "tsx": "^4.20.6"
+  }
+}

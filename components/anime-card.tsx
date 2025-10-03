@@ -11,24 +11,26 @@ interface AnimeCardProps {
   onAddToList?: (anime: Anime, listType: ListType) => void
   onRemove?: (animeId: number) => void
   onMove?: (animeId: number, toList: ListType) => void
-  currentList?: ListType | null
+  isInAnyList?: (animeId: number) => ListType | false
+  currentList?: ListType | false
   showActions?: boolean
 }
 
 const listLabels: Record<ListType, string> = {
-  toWatch: "To Watch",
-  watching: "Watching",
-  watched: "Watched",
-  doNotWatch: "Do not Watch",
+  TO_WATCH: "To Watch",
+  WATCHING: "Watching",
+  WATCHED: "Watched",
+  DO_NOT_WATCH: "Do not Watch",
 }
 
 export function AnimeCard({ anime, onAddToList, onRemove, onMove, currentList, showActions = true }: AnimeCardProps) {
-  const title = anime.title_english || anime.title
+
+  const title = anime?.title_english || anime?.title
   const synopsis = anime.synopsis
-    ? anime.synopsis.length > 150
-      ? anime.synopsis.substring(0, 150) + "..."
-      : anime.synopsis
-    : "No synopsis available."
+      ? anime.synopsis.length > 150
+        ? anime.synopsis.substring(0, 150) + "..."
+        : anime.synopsis
+      : "No synopsis available."
 
   return (
     <motion.div
@@ -41,7 +43,7 @@ export function AnimeCard({ anime, onAddToList, onRemove, onMove, currentList, s
     >
       <div className="aspect-[3/4] relative overflow-hidden bg-muted">
         <img
-          src={anime.images.jpg.large_image_url || anime.images.jpg.image_url}
+          src={anime.images?.jpg?.large_image_url || anime.images?.jpg?.image_url}
           alt={title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />

@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "com.personalanime.app",
-  "version": "0.1.8",
+  "version": "0.1.85",
   "identifier": "com.personalanime.app",
   "build": {
     "frontendDist": "../out",
@@ -13,13 +13,14 @@
     "windows": [
       {
         "label": "splashscreen",
-        "url": "http://localhost:3000/splashscreen.html",
+        "url": "../splashscreen.html",
         "width": 400,
         "height": 300,
         "decorations": false,
         "resizable": false,
         "center": true,
         "alwaysOnTop": true,
+        "visible": true,
         "transparent": true
       },
       {

@@ -10,14 +10,14 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 interface RandomSectionProps {
   onAddToList: (anime: Anime, listType: ListType) => void
-  isInAnyList: (animeId: number) => ListType | null
+  isInAnyList: (animeId: number) => ListType | false
 }
 
 const listLabels: Record<ListType, string> = {
-  toWatch: "To Watch",
-  watching: "Watching",
-  watched: "Watched",
-  doNotWatch: "Do not Watch",
+  TO_WATCH: "To Watch",
+  WATCHING: "Watching",
+  WATCHED: "Watched",
+  DO_NOT_WATCH: "Do not Watch",
 }
 
 export function RandomSection({ onAddToList, isInAnyList }: RandomSectionProps) {

@@ -1,37 +1,25 @@
+import prisma from "./prisma"
+
 export interface UserProfile {
   name: string
   avatarUrl: string
 }
 
-const USER_PROFILE_KEY = "user-profile"
+export async function getUserProfile(): Promise<UserProfile> {
 
-export function getUserProfile(): UserProfile {
-  if (typeof window === "undefined") {
-    return {
-      name: "",
-      avatarUrl: "",
-    }
-  }
-
-  const stored = localStorage.getItem(USER_PROFILE_KEY)
-  if (!stored) {
-    return {
-      name: "",
-      avatarUrl: "",
-    }
-  }
+  const profile = (await fetch('http://localhost:4000/user', { method: 'GET' }))
 
   try {
-    return JSON.parse(stored)
-  } catch {
+    return profile as any as UserProfile
+  } catch (err){
+    console.error(err)
     return {
       name: "",
-      avatarUrl: "",
+      avatarUrl: ""
     }
   }
 }
 
-export function saveUserProfile(profile: UserProfile): void {
-  if (typeof window === "undefined") return
-  localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile))
+export async function saveUserProfile(profile: UserProfile): Promise<void> {
+  await fetch('http://localhost:4000/user', { method: 'PUT', body: JSON.stringify({ username: profile.name, avatar: profile.avatarUrl }) })
 }

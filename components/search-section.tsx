@@ -6,14 +6,14 @@ import { useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Search, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
-import { searchAnime } from "@/lib/jikan-api"
+import { getAnimeById, searchAnime } from "@/lib/jikan-api"
 import type { Anime, ListType } from "@/lib/types"
 import { AnimeCard } from "./anime-card"
 import { motion, AnimatePresence } from "framer-motion"
 
 interface SearchSectionProps {
   onAddToList: (anime: Anime, listType: ListType) => void
-  isInAnyList: (animeId: number) => ListType | null
+  isInAnyList: (animeId: number) => ListType | false
 }
 
 export function SearchSection({ onAddToList, isInAnyList }: SearchSectionProps) {

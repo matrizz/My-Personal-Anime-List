@@ -1,70 +1,80 @@
-import type { AnimeList, Anime, ListType } from "./types"
+import type { Anime, ListType } from "./types"
 
-const STORAGE_KEY = "anime-lists"
 
-export function getAnimeListsFromStorage(): AnimeList {
-  if (typeof window === "undefined") {
-    return {
-      toWatch: [],
-      watching: [],
-      watched: [],
-      doNotWatch: [],
-    }
-  }
+export default async function getAnimesFromStorage(): Promise<Anime[][]> {
 
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (!stored) {
-    return {
-      toWatch: [],
-      watching: [],
-      watched: [],
-      doNotWatch: [],
-    }
-  }
+  const TO_WATCH: Anime[] = []
+  const WATCHING: Anime[] = []
+  const WATCHED: Anime[] = []
+  const DO_NOT_WATCH: Anime[] = []
 
   try {
-    return JSON.parse(stored)
-  } catch {
-    return {
-      toWatch: [],
-      watching: [],
-      watched: [],
-      doNotWatch: [],
-    }
+
+    let lists = (await (await fetch('http://localhost:4000/animes', { method: 'GET' })).json())
+
+
+    lists.forEach((list: Anime) => {
+      if (list.status ===  'TO_WATCH') TO_WATCH.push(list)
+      if (list.status === 'WATCHING') WATCHING.push(list)
+      if (list.status === 'WATCHED') WATCHED.push(list)
+      if (list.status === 'DO_NOT_WATCH') DO_NOT_WATCH.push(list)
+    })
+
+    return [
+      TO_WATCH,
+      WATCHING,
+      WATCHED,
+      DO_NOT_WATCH
+    ]
+
+  } catch (err) {
+    console.error(err)
+
+    return [
+      TO_WATCH,
+      WATCHING,
+      WATCHED,
+      DO_NOT_WATCH
+    ]
   }
 }
 
-export function saveAnimeListsToStorage(lists: AnimeList): void {
-  if (typeof window === "undefined") return
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(lists))
+
+export async function addAnimeToList(anime: Anime, listType: ListType) {
+  try {
+    await fetch('http://localhost:4000/animes', { method: 'POST', body: JSON.stringify({ listType, anime }) })
+  } catch (err) {
+    console.error(err)
+  }
 }
 
-export function addAnimeToList(anime: Anime, listType: ListType): void {
-  const lists = getAnimeListsFromStorage()
+export async function removeAnimeFromList(animeId: number, listType: ListType): Promise<void> {
 
-  // Remove from all other lists first
-  Object.keys(lists).forEach((key) => {
-    lists[key as ListType] = lists[key as ListType].filter((a) => a.mal_id !== anime.mal_id)
-  })
-
-  // Add to the specified list
-  lists[listType].push(anime)
-  saveAnimeListsToStorage(lists)
+  try {
+    await fetch('http://localhost:4000/animes', { method: 'DELETE', body: JSON.stringify({ listType, animeId }) })
+  } catch (err) {
+    console.error(err)
+  }
 }
 
-export function removeAnimeFromList(animeId: number, listType: ListType): void {
-  const lists = getAnimeListsFromStorage()
-  lists[listType] = lists[listType].filter((a) => a.mal_id !== animeId)
-  saveAnimeListsToStorage(lists)
+export async function getAnimeById(animeId: number): Promise<Anime | undefined> {
+  try {
+    const anime = await (await fetch(`http://localhost:4000/animes/${animeId}`, { method: 'GET' })).json()
+    return anime as Anime | undefined
+  } catch (err) {
+    console.error(err)
+    return undefined
+  }
 }
 
-export function moveAnimeBetweenLists(animeId: number, fromList: ListType, toList: ListType): void {
-  const lists = getAnimeListsFromStorage()
-  const anime = lists[fromList].find((a) => a.mal_id === animeId)
+export async function getUser() {
+  return await (await fetch('http://localhost:4000/user', { method: 'GET' })).json()
+}
 
-  if (anime) {
-    lists[fromList] = lists[fromList].filter((a) => a.mal_id !== animeId)
-    lists[toList].push(anime)
-    saveAnimeListsToStorage(lists)
+export async function moveAnimeBetweenLists(animeId: number, fromList: ListType, toList: ListType): Promise<void> {
+  try {
+    await fetch('http://localhost:4000/animes', { method: 'PUT', body: JSON.stringify({ fromList, toList, animeId }) })
+  } catch (err) {
+    console.error(err)
   }
 }
