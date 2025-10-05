@@ -39,16 +39,6 @@ export async function getPopularAnime(page = 1): Promise<{
   return response.json()
 }
 
-export async function getAnimeById(id: number): Promise<{ data: Anime }> {
-  const response = await fetch(`${JIKAN_API_BASE}/anime/${id}`)
-
-  if (!response.ok) {
-    throw new Error("Failed to fetch anime")
-  }
-
-  return response.json()
-}
-
 export async function getRandomAnime(): Promise<{ data: Anime }> {
   const response = await fetch(`${JIKAN_API_BASE}/random/anime`)
 

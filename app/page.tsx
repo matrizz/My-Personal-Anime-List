@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import type { ListType, ViewType } from "@/lib/types"
 import { useAnimeLists } from "@/hooks/use-anime-lists"
 import { Sidebar } from "@/components/sidebar"
@@ -11,52 +11,29 @@ import { DiscoverySection } from "@/components/discovery-section"
 import { RandomSection } from "@/components/random-section"
 
 export default function Home() {
-  const [currentView, setCurrentView] = useState<ViewType>('' as any)
-  const { animes, addAnime, removeAnime, moveAnime, isInAnyList, listsCounts } = useAnimeLists()
+  const [currentView, setCurrentView] = useState<ViewType>("discovery")
+  const { lists, addAnime, removeAnime, moveAnime, isInAnyList } = useAnimeLists()
 
-  useEffect(() => {
-    const currentViewStorage = localStorage.getItem("currentView")
-    if (currentViewStorage) {
-      setCurrentView(currentViewStorage as ViewType)
-    }
-  }, [])
-
-  useEffect(() => {
-    localStorage.setItem("currentView", currentView);
-  }, [currentView])
-
-  async function waitBackend({ port, path }: { port: number | string, path: string }, retries = 20, delay = 1000) {
-    for (let i = 0; i < retries; i++) {
-      try {
-        const res = await fetch(`http://localhost:${port}${path}`);
-        if (res.ok) return true;
-      } catch (_) {
-        // backend ainda não respondeu
-      }
-      await new Promise(r => setTimeout(r, delay));
-    }
-    throw new Error("Backend não respondeu a tempo");
+  const listCounts: Record<ListType, number> = {
+    toWatch: lists.toWatch.length,
+    watching: lists.watching.length,
+    watched: lists.watched.length,
+    doNotWatch: lists.doNotWatch.length,
   }
 
-  useEffect(() => {
-    waitBackend({ port: 4000, path: "/health" })
-      .then(() => console.log("✅ Backend pronto!"))
-      .catch(() => console.error("❌ Backend não subiu"))
-  }, []);
-
   const isListView = (view: ViewType): view is ListType => {
-    return ["TO_WATCH", "WATCHING", "WATCHED", "DO_NOT_WATCH"].includes(view)
+    return ["toWatch", "watching", "watched", "doNotWatch"].includes(view)
   }
 
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="hidden lg:block">
-        <Sidebar currentView={currentView} onViewChange={setCurrentView} listCounts={listsCounts} />
+        <Sidebar currentView={currentView} onViewChange={setCurrentView} listCounts={listCounts} />
       </div>
 
       <main className="flex-1 overflow-y-auto">
         <div className="lg:hidden sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border p-4 flex items-center gap-4">
-          <MobileNav currentView={currentView} onViewChange={setCurrentView} listCounts={listsCounts} />
+          <MobileNav currentView={currentView} onViewChange={setCurrentView} listCounts={listCounts} />
           <div>
             <h1 className="text-xl font-bold">AnimeList</h1>
           </div>
@@ -71,7 +48,7 @@ export default function Home() {
             <RandomSection onAddToList={addAnime} isInAnyList={isInAnyList} />
           ) : isListView(currentView) ? (
             <ListView
-              animes={animes || []}
+              animes={lists[currentView]}
               listType={currentView}
               onRemove={(animeId) => removeAnime(animeId, currentView)}
               onMove={(animeId, toList) => moveAnime(animeId, currentView, toList)}

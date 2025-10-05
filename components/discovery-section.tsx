@@ -10,7 +10,7 @@ import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 
 interface DiscoverySectionProps {
   onAddToList: (anime: Anime, listType: ListType) => void
-  isInAnyList: (animeId: number) => ListType | false
+  isInAnyList: (animeId: number) => ListType | null
 }
 
 export function DiscoverySection({ onAddToList, isInAnyList }: DiscoverySectionProps) {
@@ -28,7 +28,6 @@ export function DiscoverySection({ onAddToList, isInAnyList }: DiscoverySectionP
     try {
       const result = await getPopularAnime(page)
       setAnimes(result.data)
-      animes.push(...result.data)
       setCurrentPage(page)
       setHasNextPage(result.pagination.has_next_page)
     } catch (error) {
@@ -69,12 +68,12 @@ export function DiscoverySection({ onAddToList, isInAnyList }: DiscoverySectionP
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
-            {animes && animes.map((anime) => (
+            {animes.map((anime) => (
               <AnimeCard key={anime.mal_id} anime={anime} onAddToList={onAddToList} isInAnyList={isInAnyList} />
             ))}
           </motion.div>
 
-          {animes && animes.length > 0 && (
+          {animes.length > 0 && (
             <div className="flex items-center justify-center gap-4 pt-4">
               <Button variant="outline" onClick={handlePrevPage} disabled={currentPage === 1 || loading}>
                 <ChevronLeft className="w-4 h-4 mr-2" />

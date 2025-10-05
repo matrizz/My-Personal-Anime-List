@@ -20,10 +20,10 @@ const navItems = [
   { id: "search" as const, label: "Search", icon: Search },
   { id: "discovery" as const, label: "Descoberta", icon: Compass },
   { id: "random" as const, label: "Random", icon: Shuffle },
-  { id: "TO_WATCH" as const, label: "To Watch", icon: Clock },
-  { id: "WATCHING" as const, label: "Watching", icon: Eye },
-  { id: "WATCHED" as const, label: "Watched", icon: CheckCircle2 },
-  { id: "DO_NOT_WATCH" as const, label: "Do not Watch", icon: XCircle },
+  { id: "toWatch" as const, label: "To Watch", icon: Clock },
+  { id: "watching" as const, label: "Watching", icon: Eye },
+  { id: "watched" as const, label: "Watched", icon: CheckCircle2 },
+  { id: "doNotWatch" as const, label: "Do not Watch", icon: XCircle },
 ]
 
 export function Sidebar({ currentView, onViewChange, listCounts }: SidebarProps) {
@@ -47,6 +47,7 @@ export function Sidebar({ currentView, onViewChange, listCounts }: SidebarProps)
               item.id !== "search" && item.id !== "discovery" && item.id !== "random"
                 ? listCounts[item.id as ListType]
                 : undefined
+
             return (
               <Button
                 key={item.id}

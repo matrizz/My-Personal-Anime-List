@@ -76,6 +76,7 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
+  /* Color Palette - Dark theme inspired by Vercel */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
@@ -122,10 +123,6 @@
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
-* {
-  user-select: none;
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -135,6 +132,7 @@
   }
 }
 
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;

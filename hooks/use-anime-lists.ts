@@ -1,75 +1,52 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { type Anime, type ListType, Status } from "@/lib/types"
-import getAnimeFromStorage, { addAnimeToList, removeAnimeFromList, moveAnimeBetweenLists } from "@/lib/storage"
+import type { AnimeList, Anime, ListType } from "@/lib/types"
+import { getAnimeListsFromStorage, addAnimeToList, removeAnimeFromList, moveAnimeBetweenLists } from "@/lib/storage"
 
 export function useAnimeLists() {
-  const [animes, setAnimes] = useState<Anime[]>([])
-  const [listsCounts, setCounts] = useState({ TO_WATCH: 0, WATCHING: 0, WATCHED: 0, DO_NOT_WATCH: 0 })
-  const [loading, setLoading] = useState(true)
+  const [lists, setLists] = useState<AnimeList>({
+    toWatch: [],
+    watching: [],
+    watched: [],
+    doNotWatch: [],
+  })
 
   useEffect(() => {
-    getAnimeFromStorage()
-      .then((result) => setAnimes(result.flat()))
-      .finally(() => setLoading(false))
+    setLists(getAnimeListsFromStorage())
   }, [])
 
-  useEffect(() => {
-
-    const newCounts = { TO_WATCH: 0, WATCHING: 0, WATCHED: 0, DO_NOT_WATCH: 0 }
-
-    animes.forEach((anime) => {
-      if (anime.status === "TO_WATCH") newCounts.TO_WATCH++
-      else if (anime.status === "WATCHING") newCounts.WATCHING++
-      else if (anime.status === "WATCHED") newCounts.WATCHED++
-      else if (anime.status === "DO_NOT_WATCH") newCounts.DO_NOT_WATCH++
-    })
-
-    setCounts(newCounts)
-  }, [animes])
-
-  const addAnime = async (anime: Anime, listType: ListType) => {
+  const addAnime = (anime: Anime, listType: ListType) => {
     addAnimeToList(anime, listType)
-    setAnimes(prev => [...prev.filter(a => a.mal_id !== anime.mal_id), { ...anime, status: listType }])
+    setLists(getAnimeListsFromStorage())
   }
 
-  const removeAnime = async (animeId: number, listType: ListType) => {
+  const removeAnime = (animeId: number, listType: ListType) => {
     removeAnimeFromList(animeId, listType)
-    setAnimes((prev) => prev.filter(a => a.mal_id !== animeId))
+    setLists(getAnimeListsFromStorage())
   }
 
-  const moveAnime = async (animeId: number, fromList: ListType, toList: ListType) => {
+  const moveAnime = (animeId: number, fromList: ListType, toList: ListType) => {
     moveAnimeBetweenLists(animeId, fromList, toList)
-    setAnimes(prev => prev.map(a => a.mal_id === animeId ? { ...a, status: toList } : a))
+    setLists(getAnimeListsFromStorage())
   }
 
-  const isInList = async (animeId: number, listType: ListType): Promise<boolean> => {
-    if (!animes) {
-      return false
-    }
-
-    return !!animes.find((anime) => animeId === anime.mal_id && anime.status === listType)
+  const isInList = (animeId: number, listType: ListType): boolean => {
+    return lists[listType].some((a) => a.mal_id === animeId)
   }
 
-  const isInAnyList = (animeId: number): ListType | false => {
-    if (!animes) {
-      return false
+  const isInAnyList = (animeId: number): ListType | null => {
+    for (const [key, value] of Object.entries(lists)) {
+      if (value.some((a: Anime) => a.mal_id === animeId)) {
+        return key as ListType
+      }
     }
-
-    if (animes.find((anime) => anime.mal_id === animeId)) return Status.TO_WATCH
-    else if (animes.find((anime) => anime.mal_id === animeId)) return Status.WATCHING
-    else if (animes.find((anime) => anime.mal_id === animeId)) return Status.WATCHED
-    else if (animes.find((anime) => anime.mal_id === animeId)) return Status.DO_NOT_WATCH
-
-    return false
+    return null
   }
 
   return {
-    animes,
+    lists,
     addAnime,
-    listsCounts,
-    loading,
     removeAnime,
     moveAnime,
     isInList,

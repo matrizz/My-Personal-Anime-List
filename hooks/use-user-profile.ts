@@ -7,7 +7,7 @@ export function useUserProfile() {
   const [profile, setProfile] = useState<UserProfile>({ name: "", avatarUrl: "" })
 
   useEffect(() => {
-    getUserProfile().then((res) => setProfile(res))    
+    setProfile(getUserProfile())
   }, [])
 
   const updateProfile = (newProfile: UserProfile) => {
