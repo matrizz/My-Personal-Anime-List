@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { ListType, ViewType } from "@/lib/types"
 import { useAnimeLists } from "@/hooks/use-anime-lists"
 import { Sidebar } from "@/components/sidebar"
@@ -13,6 +13,17 @@ import { RandomSection } from "@/components/random-section"
 export default function Home() {
   const [currentView, setCurrentView] = useState<ViewType>("discovery")
   const { lists, addAnime, removeAnime, moveAnime, isInAnyList } = useAnimeLists()
+
+  useEffect(() => {
+    const currentViewStorage = localStorage.getItem("currentView")
+    if (currentViewStorage) {
+      setCurrentView(currentViewStorage as ViewType)
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem("currentView", currentView);
+  }, [currentView])
 
   const listCounts: Record<ListType, number> = {
     toWatch: lists.toWatch.length,
